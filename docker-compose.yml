@@ -7,19 +7,19 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       PORT: 3000
-      APP_SECRET: ${APP_SECRET:?Defina APP_SECRET no .env}
+      APP_SECRET: ${APP_SECRET}
       DB_HOST: ${DB_HOST_DOCKER:-host.docker.internal}
-      DB_PORT: ${DB_PORT:-3305}
-      DB_NAME: ${DB_NAME:-am_altto_calculator}
-      DB_USER: ${DB_USER:-}
-      DB_PASSWORD: ${DB_PASSWORD:-}
-      DEMO_MODE: ${DEMO_MODE:-false}
-      DEMO_PASSWORD: ${DEMO_PASSWORD:-altto2026}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      USER_ELIZEU_PASSWORD: ${USER_ELIZEU_PASSWORD:-}
-      USER_ELIZEU_ROLE: ${USER_ELIZEU_ROLE:-manager}
-      USER_VENDEDOR_PASSWORD: ${USER_VENDEDOR_PASSWORD:-}
-      USER_VENDEDOR_ROLE: ${USER_VENDEDOR_ROLE:-seller}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DEMO_MODE: ${DEMO_MODE}
+      DEMO_PASSWORD: ${DEMO_PASSWORD}
+      COOKIE_SECURE: ${COOKIE_SECURE}
+      USER_ELIZEU_PASSWORD: ${USER_ELIZEU_PASSWORD}
+      USER_ELIZEU_ROLE: ${USER_ELIZEU_ROLE}
+      USER_VENDEDOR_PASSWORD: ${USER_VENDEDOR_PASSWORD}
+      USER_VENDEDOR_ROLE: ${USER_VENDEDOR_ROLE}
     volumes:
       - altto_data:/app/data
     healthcheck:
