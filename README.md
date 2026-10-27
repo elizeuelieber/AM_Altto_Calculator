@@ -13,7 +13,7 @@ Aplicação web responsiva e autônoma para cadastrar clientes, linhas e produto
 
 A faixa é calculada no servidor com parâmetros ativos. O modelo de margem usa o custo unitário dividido pela parcela restante após impostos, comissão, rateio fixo e margem desejada. Esta é uma fórmula técnica configurável a validar: a planilha fornecida tem premissas e inconsistências apontadas na própria aba Auditoria. Nenhum imposto, custo, preço ou taxa da planilha foi carregado como premissa aprovada. O banco não recebe parâmetros inicialmente; o gestor deve cadastrar os valores deliberadamente aprovados antes de iniciar os cálculos.
 
-Farol do item: vermelho abaixo do mínimo, amarelo entre mínimo e máximo, verde no máximo ou acima. No pedido, prevalece o item de situação mais crítica. O preço de tabela é cadastrado separadamente de CPV/custos.
+Farol da cotação: usa a margem bruta consolidada do pedido (total dos itens, menos impostos e CPV, dividido pela receita dos itens), sem incluir frete ou comissão nessa etapa. Abaixo do mínimo vigente (30% na configuração padrão), fica vermelho; do mínimo até abaixo do alvo (40% na configuração padrão), amarelo; no alvo ou acima, verde. Depois do lucro bruto, o sistema deduz frete e comissão para calcular a margem de contribuição; essa margem não altera o Farol. O valor total comercial mostrado ao usuário inclui o frete. O preço de tabela é cadastrado separadamente de CPV/custos.
 
 ## Banco e preparação
 
@@ -33,6 +33,12 @@ Para navegar sem MySQL, configure `DEMO_MODE=true`, defina `APP_SECRET` e uma se
 
 No Docker Desktop, configure `DB_HOST_DOCKER=host.docker.internal`; em Linux/VPS, use o endereço do MySQL alcançável pelo contêiner. Rode `docker compose up -d --build`. Para produção, use HTTPS, `COOKIE_SECURE=true`, segredos exclusivos, firewall e backup testado; não exponha MySQL publicamente. Variáveis de novos usuários devem ser incluídas no `docker-compose.yml`.
 
-Usuários são configurados por variáveis de ambiente, por exemplo `USER_ELIZEU_PASSWORD` com `USER_ELIZEU_ROLE=manager`; perfis sellers recebem cotações próprias e não podem chamar endpoints administrativos ou o Mapa de Margens. Gestores têm acesso ao mapa e aos cadastros.
+## Usuários e acesso
+
+Aplique `db/005_user_accounts.sql` uma vez após as migrações comerciais e antes de iniciar a versão atualizada. A primeira inicialização cria as contas iniciais indicadas no `.env.example`, caso ainda não existam. O usuário informa o **nome de usuário** configurado, não o nome de exibição. O hash de senha é armazenado em `BINARY(80)` (salt aleatório de 16 bytes + derivação scrypt de 64 bytes); a senha original não é gravada. Uma conta existente não tem a senha redefinida automaticamente ao reiniciar; use a gestão de usuários ou redefina pelo administrador.
+
+O perfil **Administrador** vê todas as cotações, detalhes financeiros, mapa de margens, cadastros e usuários. **Vendedor** vê e edita somente cotações vinculadas à sua conta e não acessa gestão nem composição confidencial. As cotações antigas continuam acessíveis aos vendedores pelo usuário ou nome de proprietário legado quando possível.
+
+No modo demonstração, os usuários padrão são `admin` e `vendedor`. Configure senhas distintas em `DEMO_ADMIN_PASSWORD` e `DEMO_SELLER_PASSWORD` antes de usar; `DEMO_PASSWORD` serve como compatibilidade/fallback. Dados criados na demonstração são apenas em memória.
 
 A aplicação não integra ERP/n8n nesta fase, não inclui fluxo de aprovação formal e ainda requer validação das fórmulas e dados comerciais/fiscais por Comercial e Contabilidade antes de uso em negociação real.

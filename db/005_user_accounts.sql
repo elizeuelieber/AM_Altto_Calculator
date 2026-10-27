@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS altto_app_users (
   INDEX idx_altto_users_role_active (role,is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Mantém compatibilidade com a tabela atual de cotações. O owner existente guarda
--- o nome do usuário; a aplicação consulta nome e login para acomodar registros antigos.
+-- A tabela altto_app_quotes existente já indexa owner; novas cotações guardam o login
+-- nessa coluna e também o identificador imutável do usuário no payload. O administrador
+-- consulta todas; vendedores são filtrados por owner/login. Não remove dados legados.
