@@ -3,10 +3,9 @@ services:
     build: .
     container_name: altto-calculadora
     restart: unless-stopped
-    ports:
-      - "${PORT:-3000}:3000"
+
     environment:
-      PORT: 3000
+      PORT: "3001"
       APP_SECRET: ${APP_SECRET}
       DB_HOST: ${DB_HOST_DOCKER}
       DB_PORT: ${DB_PORT}
@@ -20,13 +19,38 @@ services:
       USER_ELIZEU_ROLE: ${USER_ELIZEU_ROLE}
       USER_VENDEDOR_PASSWORD: ${USER_VENDEDOR_PASSWORD}
       USER_VENDEDOR_ROLE: ${USER_VENDEDOR_ROLE}
+
     volumes:
       - altto_data:/app/data
+
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=root_default"
+      - "traefik.http.routers.altto-http.rule=Host(`calc.srv850139.hstgr.cloud`)"
+      - "traefik.http.routers.altto-http.entrypoints=web"
+      - "traefik.http.routers.altto-http.middlewares=altto-https"
+      - "traefik.http.middlewares.altto-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.altto.rule=Host(`calc.srv850139.hstgr.cloud`)"
+      - "traefik.http.routers.altto.entrypoints=websecure"
+      - "traefik.http.routers.altto.tls=true"
+      - "traefik.http.routers.altto.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.altto.service=altto"
+      - "traefik.http.services.altto.loadbalancer.server.scheme=http"
+      - "traefik.http.services.altto.loadbalancer.server.port=3001"
+
+    networks:
+      - root_default
+
 volumes:
   altto_data:
+
+networks:
+  root_default:
+    external: true
